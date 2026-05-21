@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="부뮤일광 선생님">
+<meta name="theme-color" content="#ffffff">
+<title>부산뮤직 일광점 선생님</title>
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<link rel="icon" type="image/png" href="./icon-192.png">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;width:100%;overflow-x:hidden;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Noto Sans KR',sans-serif;font-size:14px;background:#f5f5f5;color:#1a1a1a;}
+.page{display:none;}.page.active{display:block;}
+
+/* ── 홈 ── */
+.home-header{background:#fff;border-bottom:1px solid #e8e8e8;padding:22px 20px 16px;display:flex;align-items:flex-end;justify-content:space-between;}
+.home-title{font-size:22px;font-weight:600;}
+.home-sub{font-size:13px;color:#888;margin-top:3px;}
+.settings-btn{display:flex;align-items:center;gap:5px;padding:8px 14px;border:1px solid #ddd;border-radius:10px;background:#fff;cursor:pointer;font-size:13px;color:#666;}
+
+.teacher-grid{padding:16px;display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:12px;}
+.tc-card{background:#fff;border:1px solid #eee;border-top-width:3px;border-radius:14px;padding:18px 10px 14px;display:flex;flex-direction:column;align-items:center;gap:9px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.tc-card:active{opacity:0.7;}
+.tc-subj{font-size:11px;padding:3px 9px;border-radius:20px;font-weight:600;}
+
+/* ── 상세 페이지 ── */
+.detail-wrap{display:flex;min-height:100vh;}
+.detail-sidebar{width:200px;flex-shrink:0;background:#fff;border-right:1px solid #e8e8e8;display:flex;flex-direction:column;}
+.sidebar-header{padding:12px;border-bottom:1px solid #e8e8e8;display:flex;align-items:center;gap:6px;}
+.sidebar-back{padding:6px 10px;border:1px solid #ddd;border-radius:8px;background:#fff;cursor:pointer;font-size:12px;color:#666;display:flex;align-items:center;gap:3px;-webkit-tap-highlight-color:transparent;}
+.sidebar-list{flex:1;overflow-y:auto;padding:8px;}
+.sl-item{display:flex;align-items:center;gap:8px;padding:8px 9px;border-radius:10px;cursor:pointer;margin-bottom:3px;border-left:3px solid transparent;-webkit-tap-highlight-color:transparent;}
+.sl-item:active{background:#f0f0f0;}
+.sl-item.active{background:#f7f7f7;}
+.sl-name{font-size:12px;font-weight:600;flex:1;}
+.sl-subj{font-size:10px;padding:2px 6px;border-radius:12px;}
+
+.detail-content{flex:1;display:flex;flex-direction:column;min-width:0;overflow-y:auto;min-height:100vh;}
+.detail-topbar{background:#fff;border-bottom:1px solid #e8e8e8;padding:10px 16px;display:flex;align-items:center;justify-content:flex-end;gap:8px;}
+.edit-btn{display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;padding:6px 12px;border-radius:8px;border:1px solid #ddd;background:#fff;color:#333;}
+
+/* 프로필 */
+.profile-hero{padding:22px;background:#fff;border-bottom:1px solid #e8e8e8;border-top:3px solid #ccc;display:flex;gap:20px;align-items:flex-start;}
+.photo-col{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:7px;}
+.p-photo-wrap{position:relative;cursor:pointer;}
+.p-photo{border-radius:14px;display:flex;align-items:center;justify-content:center;font-weight:600;border:1px solid #eee;overflow:hidden;}
+.p-photo img{width:100%;height:100%;object-fit:cover;}
+.photo-ov{position:absolute;inset:0;border-radius:14px;background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.15s;}
+.photo-ov svg{color:white;}
+.p-photo-wrap:hover .photo-ov{opacity:1;}
+.photo-hint{font-size:10px;color:#999;text-align:center;}
+.info-col{flex:1;min-width:0;}
+.p-name{font-weight:600;margin-bottom:5px;}
+.p-badge{font-size:11px;padding:3px 11px;border-radius:20px;font-weight:600;display:inline-block;margin-bottom:10px;}
+.p-intro{line-height:1.8;color:#666;}
+
+.pbody{padding:16px 22px;display:flex;flex-direction:column;gap:14px;}
+.scard{background:#fff;border:1px solid #eee;border-radius:14px;padding:14px 16px;}
+.slabel{font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;}
+.edu-row{display:flex;gap:9px;padding:6px 0;border-bottom:1px solid #f0f0f0;align-items:flex-start;}
+.edu-row:last-child{border:none;}
+.edu-dot{width:7px;height:7px;border-radius:50%;margin-top:5px;flex-shrink:0;}
+.edu-text{font-size:13px;}
+.edu-year{font-size:11px;color:#999;}
+.row-del{padding:3px 6px;border:none;background:transparent;cursor:pointer;font-size:15px;color:#bbb;border-radius:4px;margin-left:auto;flex-shrink:0;}
+.add-row-btn{margin-top:8px;padding:6px 12px;border:1px dashed #ccc;border-radius:8px;cursor:pointer;font-size:12px;color:#999;background:transparent;display:flex;align-items:center;gap:4px;}
+
+.curr-open-btn{margin:4px 22px 28px;padding:15px;border:none;border-radius:14px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;color:white;width:calc(100% - 44px);-webkit-tap-highlight-color:transparent;}
+.curr-open-btn:active{opacity:0.8;}
+
+/* 커리큘럼 */
+.curr-view{padding:20px 22px;}
+.curr-view-header{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+.curr-back-btn{display:flex;align-items:center;gap:4px;padding:7px 13px;border:1px solid #ddd;border-radius:9px;background:#fff;cursor:pointer;font-size:13px;color:#666;}
+.curr-view-title{font-size:16px;font-weight:600;}
+.table-edit-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.week-table{width:100%;border-collapse:collapse;background:#fff;border-radius:14px;overflow:hidden;border:1px solid #eee;}
+.week-table th{padding:11px 14px;font-size:12px;font-weight:700;text-align:left;border-bottom:1px solid rgba(255,255,255,0.3);color:white;}
+.week-table td{padding:10px 14px;font-size:13px;border-bottom:1px solid #f0f0f0;vertical-align:top;}
+.week-table tr:last-child td{border-bottom:none;}
+.week-table tr:hover td{background:#fafafa;}
+.week-num{font-size:12px;font-weight:700;color:white;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+.wk-topic{font-size:13px;font-weight:600;}
+.wk-desc{font-size:12px;color:#888;margin-top:2px;}
+.edit-cell{display:flex;flex-direction:column;gap:5px;}
+
+input.ie,textarea.ie{border:1px solid #ddd;border-radius:7px;padding:5px 8px;font-size:inherit;font-family:inherit;color:#333;background:#fff;width:100%;}
+textarea.ie{resize:vertical;min-height:52px;line-height:1.6;}
+
+/* 설정 패널 */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:100;display:none;align-items:flex-start;justify-content:flex-end;}
+.overlay.open{display:flex;}
+.settings-panel{background:#fff;width:270px;min-height:100vh;padding:22px 18px;display:flex;flex-direction:column;gap:16px;}
+.sp-header{display:flex;align-items:center;justify-content:space-between;}
+.sp-title{font-size:17px;font-weight:700;}
+.sp-close{padding:5px;border:none;background:transparent;cursor:pointer;font-size:20px;color:#999;}
+.sp-section{font-size:11px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;}
+.sp-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.sp-label{font-size:13px;color:#333;}
+.sp-controls{display:flex;align-items:center;gap:8px;}
+.sp-btn{width:30px;height:30px;border:1px solid #ddd;border-radius:8px;background:#fff;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;-webkit-tap-highlight-color:transparent;}
+.sp-val{font-size:13px;font-weight:700;min-width:28px;text-align:center;}
+.sp-divider{border:none;border-top:1px solid #f0f0f0;}
+.sp-note{font-size:12px;color:#999;line-height:1.6;background:#f7f7f7;padding:12px;border-radius:10px;}
+
+/* 모달 */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:none;align-items:center;justify-content:center;padding:20px;z-index:200;}
+.modal-bg.open{display:flex;}
+.modal{background:#fff;border-radius:16px;padding:22px;width:100%;max-width:340px;}
+.modal h3{font-size:16px;font-weight:700;margin-bottom:14px;}
+.fg{margin-bottom:12px;}
+.flbl{font-size:12px;font-weight:600;color:#888;display:block;margin-bottom:5px;}
+.finput,.fselect,.ftxt{width:100%;padding:9px 11px;border:1px solid #ddd;border-radius:10px;font-size:13px;font-family:inherit;color:#333;background:#fff;}
+.ftxt{min-height:68px;resize:vertical;}
+.mbtns{display:flex;gap:8px;margin-top:14px;}
+.mbcancel{flex:1;padding:10px;border:1px solid #ddd;border-radius:10px;cursor:pointer;font-size:13px;font-family:inherit;background:#fff;color:#333;}
+.mbok{flex:1;padding:10px;border:none;border-radius:10px;cursor:pointer;font-size:13px;font-family:inherit;color:white;font-weight:700;}
+
+/* 홈버튼 (사이드바에 선생님 추가) */
+.add-btn{margin:8px 8px 14px;padding:10px;border:1px dashed #ccc;border-radius:10px;cursor:pointer;font-size:12px;color:#999;background:transparent;display:flex;align-items:center;justify-content:center;gap:4px;-webkit-tap-highlight-color:transparent;}
+</style>
+</head>
+<body>
+
+<!-- 설정 패널 -->
+<div class="overlay" id="settings-overlay" onclick="closeSettings(event)">
+  <div class="settings-panel" onclick="event.stopPropagation()">
+    <div class="sp-header">
+      <span class="sp-title">설정</span>
+      <button class="sp-close" onclick="closeSettings()">✕</button>
+    </div>
+    <hr class="sp-divider">
+    <div>
+      <div class="sp-section">사진 크기</div>
+      <div class="sp-row"><span class="sp-label">목록 아이콘</span><div class="sp-controls"><button class="sp-btn" onclick="adj('avatar',-4)">−</button><span class="sp-val" id="val-avatar">40</span><button class="sp-btn" onclick="adj('avatar',4)">+</button></div></div>
+      <div class="sp-row"><span class="sp-label">프로필 사진</span><div class="sp-controls"><button class="sp-btn" onclick="adj('photo',-8)">−</button><span class="sp-val" id="val-photo">110</span><button class="sp-btn" onclick="adj('photo',8)">+</button></div></div>
+      <div class="sp-row"><span class="sp-label">홈 카드 아이콘</span><div class="sp-controls"><button class="sp-btn" onclick="adj('card',-4)">−</button><span class="sp-val" id="val-card">56</span><button class="sp-btn" onclick="adj('card',4)">+</button></div></div>
+    </div>
+    <hr class="sp-divider">
+    <div>
+      <div class="sp-section">글자 크기</div>
+      <div class="sp-row"><span class="sp-label">이름</span><div class="sp-controls"><button class="sp-btn" onclick="adj('nameSize',-1)">−</button><span class="sp-val" id="val-nameSize">14</span><button class="sp-btn" onclick="adj('nameSize',1)">+</button></div></div>
+      <div class="sp-row"><span class="sp-label">본문</span><div class="sp-controls"><button class="sp-btn" onclick="adj('bodySize',-1)">−</button><span class="sp-val" id="val-bodySize">13</span><button class="sp-btn" onclick="adj('bodySize',1)">+</button></div></div>
+    </div>
+    <hr class="sp-divider">
+    <div class="sp-note">두 손가락으로 화면을 오므리거나 벌리면 전체 화면을 확대·축소할 수 있습니다.</div>
+  </div>
+</div>
+
+<!-- 모달 -->
+<div class="modal-bg" id="modal-bg"><div class="modal" id="modal-inner"></div></div>
+
+<!-- 페이지1: 홈 -->
+<div class="page active" id="pg-home">
+  <div class="home-header">
+    <div>
+      <div class="home-title">부산뮤직 일광점</div>
+      <div class="home-sub">선생님 프로필 안내</div>
+    </div>
+    <button class="settings-btn" onclick="openSettings()">⚙ 설정</button>
+  </div>
+  <div class="teacher-grid" id="home-grid"></div>
+</div>
+
+<!-- 페이지2: 선생님 상세 -->
+<div class="page" id="pg-detail">
+  <div class="detail-wrap">
+    <div class="detail-sidebar">
+      <div class="sidebar-header">
+        <button class="sidebar-back" onclick="goHome()">← 목록</button>
+        <button class="settings-btn" style="padding:6px 10px;margin-left:auto;" onclick="openSettings()">⚙</button>
+      </div>
+      <div class="sidebar-list" id="sidebar-list"></div>
+      <div class="add-btn" onclick="showAddTeacher()">+ 선생님 추가</div>
+    </div>
+    <div class="detail-content" id="detail-content"></div>
+  </div>
+</div>
+
+<script>
+const T_DATA=[
+  {name:'박은진',subject:'보컬',color:'#E74C3C',bg:'#FDEDEC'},
+  {name:'정아미',subject:'보컬',color:'#E67E22',bg:'#FEF5EC'},
+  {name:'홍기철',subject:'보컬',color:'#C0392B',bg:'#FBEAEA'},
+  {name:'손유리',subject:'보컬',color:'#D4537E',bg:'#FBEAF0'},
+  {name:'안지은',subject:'피아노',color:'#1D9E75',bg:'#E1F5EE'},
+  {name:'조현수',subject:'기타',color:'#534AB7',bg:'#EEEDFE'},
+  {name:'정희경',subject:'베이스',color:'#185FA5',bg:'#E6F1FB'},
+  {name:'마상령',subject:'미디',color:'#6B3A2A',bg:'#F5EBE8'},
+  {name:'연승모',subject:'작곡',color:'#BA7517',bg:'#FAEEDA'},
+  {name:'홍성률',subject:'드럼',color:'#378ADD',bg:'#EAF3FD'},
+  {name:'조민경',subject:'댄스',color:'#8B7000',bg:'#FDFBE6'},
+];
+
+function makeWeeks(){return Array.from({length:16},(_,i)=>({week:i+1,topic:'',desc:''}));}
+
+let DB=T_DATA.map((t,i)=>({
+  id:i,name:t.name,subject:t.subject,role:t.subject+' 강사',
+  color:t.color,bg:t.bg,photo:null,initials:t.name.slice(0,1),
+  intro:'소개를 입력해주세요.',edu:[],weeks:makeWeeks()
+}));
+
+let currentId=null,editMode=false,currEditMode=false,currentView='profile',nextId=20;
+const SIZES={avatar:40,photo:110,card:56,nameSize:14,bodySize:13};
+const LIMITS={avatar:[24,80],photo:[70,180],card:[36,100],nameSize:[11,22],bodySize:[10,18]};
+
+// localStorage에서 데이터 복원
+function loadData(){
+  try{
+    const saved=localStorage.getItem('bm_profile_db');
+    if(saved){DB=JSON.parse(saved);}
+    const savedSizes=localStorage.getItem('bm_sizes');
+    if(savedSizes){Object.assign(SIZES,JSON.parse(savedSizes));}
+  }catch(e){}
+}
+
+function saveData(){
+  try{
+    localStorage.setItem('bm_profile_db',JSON.stringify(DB));
+    localStorage.setItem('bm_sizes',JSON.stringify(SIZES));
+  }catch(e){}
+}
+
+function adj(k,d){
+  const [mn,mx]=LIMITS[k];
+  SIZES[k]=Math.min(mx,Math.max(mn,SIZES[k]+d));
+  document.getElementById('val-'+k).textContent=SIZES[k];
+  saveData();
+  renderHomeGrid();renderSidebarList();
+  if(currentId!==null)renderDetailContent();
+}
+
+function syncSizeUI(){
+  Object.keys(SIZES).forEach(k=>{
+    const el=document.getElementById('val-'+k);
+    if(el)el.textContent=SIZES[k];
+  });
+}
+
+function openSettings(){document.getElementById('settings-overlay').classList.add('open');}
+function closeSettings(e){if(!e||e.target===document.getElementById('settings-overlay'))document.getElementById('settings-overlay').classList.remove('open');}
+
+function goHome(){
+  document.getElementById('pg-home').classList.add('active');
+  document.getElementById('pg-detail').classList.remove('active');
+  editMode=false;currEditMode=false;currentView='profile';
+}
+
+function goDetail(id){
+  currentId=id;editMode=false;currEditMode=false;currentView='profile';
+  document.getElementById('pg-home').classList.remove('active');
+  document.getElementById('pg-detail').classList.add('active');
+  renderSidebarList();renderDetailContent();
+}
+
+function switchTeacher(id){
+  currentId=id;editMode=false;currEditMode=false;currentView='profile';
+  renderSidebarList();renderDetailContent();
+}
+
+function renderDetailContent(){
+  if(currentView==='profile')renderProfileView();
+  else renderCurriculumView();
+}
+
+function circleHTML(t,size){
+  const fs=Math.round(size*0.38);
+  if(t.photo)return`<div style="width:${size}px;height:${size}px;border-radius:50%;overflow:hidden;flex-shrink:0;"><img src="${t.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" alt="${t.name}"></div>`;
+  return`<div style="width:${size}px;height:${size}px;border-radius:50%;background:${t.bg};color:${t.color};display:flex;align-items:center;justify-content:center;font-size:${fs}px;font-weight:700;flex-shrink:0;">${t.initials}</div>`;
+}
+
+function renderHomeGrid(){
+  const g=document.getElementById('home-grid');
+  const cs=SIZES.card;
+  g.innerHTML=DB.map(t=>`
+    <div class="tc-card" style="border-top-color:${t.color}" onclick="goDetail(${t.id})">
+      ${circleHTML(t,cs)}
+      <div style="font-weight:600;font-size:${SIZES.nameSize}px;text-align:center">${t.name}</div>
+      <span class="tc-subj" style="background:${t.bg};color:${t.color}">${t.subject}</span>
+    </div>`).join('');
+}
+
+function renderSidebarList(){
+  const wrap=document.getElementById('sidebar-list');
+  wrap.innerHTML=DB.map(t=>`
+    <div class="sl-item${currentId===t.id?' active':''}" style="border-left-color:${currentId===t.id?t.color:'transparent'}" onclick="switchTeacher(${t.id})">
+      ${circleHTML(t,SIZES.avatar)}
+      <span class="sl-name">${t.name}</span>
+      <span class="sl-subj" style="background:${t.bg};color:${t.color}">${t.subject}</span>
+    </div>`).join('');
+}
+
+function renderProfileView(){
+  const t=DB.find(x=>x.id===currentId);if(!t)return;
+  const ps=SIZES.photo;const pfs=Math.round(ps*0.22);const bs=SIZES.bodySize;
+  const photoInner=t.photo
+    ?`<img src="${t.photo}" alt="${t.name}" style="width:100%;height:100%;object-fit:cover;">`
+    :`<span style="color:${t.color};font-size:${pfs}px;font-weight:700">${t.initials}</span>`;
+
+  document.getElementById('detail-content').innerHTML=`
+    <div class="detail-topbar">
+      <button class="edit-btn" id="prof-edit-btn" onclick="toggleProfileEdit()">✎ 편집</button>
+    </div>
+    <div class="profile-hero" style="border-top-color:${t.color}">
+      <div class="photo-col">
+        <div class="p-photo-wrap" onclick="${editMode?'triggerPhoto()':''}">
+          <div class="p-photo" style="width:${ps}px;height:${ps}px;background:${t.photo?'transparent':t.bg}">${photoInner}</div>
+          ${editMode?`<div class="photo-ov"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg></div>`:''}
+        </div>
+        ${editMode?`<div class="photo-hint">탭하여<br>사진 변경</div>`:''}
+        <input type="file" id="photo-input" accept="image/*" style="display:none" onchange="handlePhoto(event)">
+      </div>
+      <div class="info-col">
+        ${editMode
+          ?`<input class="ie" style="font-size:${SIZES.nameSize+4}px;font-weight:700;margin-bottom:7px;" value="${t.name} 선생님" id="edit-name">
+             <input class="ie" style="font-size:${bs}px;margin-bottom:9px;" value="${t.role}" id="edit-role">
+             <textarea class="ie" style="font-size:${bs}px;" id="edit-intro">${t.intro}</textarea>`
+          :`<div class="p-name" style="font-size:${SIZES.nameSize+4}px">${t.name} 선생님</div>
+            <span class="p-badge" style="background:${t.bg};color:${t.color}">${t.subject}</span>
+            <div class="p-intro" style="font-size:${bs}px">${t.intro}</div>`}
+      </div>
+    </div>
+    <div class="pbody">
+      <div class="scard">
+        <div class="slabel">학력 및 경력</div>
+        ${t.edu.length===0&&!editMode?`<div style="font-size:${bs}px;color:#999">편집 버튼을 눌러 내용을 추가해주세요.</div>`:''}
+        <div id="edu-list">
+          ${t.edu.map((e,i)=>`
+            <div class="edu-row">
+              <div class="edu-dot" style="background:${t.color}"></div>
+              <div style="flex:1">
+                ${editMode
+                  ?`<input class="ie" style="font-size:${bs}px;margin-bottom:3px;" value="${e.text}" onchange="updateEdu(${i},'text',this.value)">
+                    <input class="ie" style="font-size:11px;" value="${e.year}" onchange="updateEdu(${i},'year',this.value)">`
+                  :`<div class="edu-text" style="font-size:${bs}px">${e.text}</div><div class="edu-year">${e.year}</div>`}
+              </div>
+              ${editMode?`<button class="row-del" onclick="removeEdu(${i})">✕</button>`:''}
+            </div>`).join('')}
+        </div>
+        ${editMode?`<button class="add-row-btn" onclick="addEdu()">+ 항목 추가</button>`:''}
+      </div>
+    </div>
+    <button class="curr-open-btn" style="background:${t.color}" onclick="openCurriculum()">
+      📋 16주 커리큘럼 보기
+    </button>
+  `;
+}
+
+function toggleProfileEdit(){
+  if(editMode){
+    const t=DB.find(x=>x.id===currentId);
+    const nv=(document.getElementById('edit-name')?.value||'').replace(' 선생님','').trim();
+    if(nv){t.name=nv;t.initials=nv.slice(0,1);}
+    t.role=document.getElementById('edit-role')?.value||t.role;
+    t.intro=document.getElementById('edit-intro')?.value||t.intro;
+    saveData();renderHomeGrid();renderSidebarList();editMode=false;
+  }else{editMode=true;}
+  renderProfileView();
+}
+
+function triggerPhoto(){document.getElementById('photo-input').click();}
+function handlePhoto(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{DB.find(x=>x.id===currentId).photo=ev.target.result;saveData();renderProfileView();renderHomeGrid();renderSidebarList();};
+  r.readAsDataURL(f);
+}
+function updateEdu(i,f,v){DB.find(x=>x.id===currentId).edu[i][f]=v;}
+function removeEdu(i){DB.find(x=>x.id===currentId).edu.splice(i,1);saveData();renderProfileView();}
+function addEdu(){DB.find(x=>x.id===currentId).edu.push({year:'연도',text:'내용을 입력하세요'});saveData();renderProfileView();}
+
+function openCurriculum(){currentView='curriculum';currEditMode=false;renderCurriculumView();}
+
+function renderCurriculumView(){
+  const t=DB.find(x=>x.id===currentId);if(!t)return;
+  const bs=SIZES.bodySize;
+  const tableRows=t.weeks.map((w,i)=>`
+    <tr>
+      <td style="width:52px;padding:8px 10px;">
+        <div class="week-num" style="background:${t.color}">${w.week}</div>
+      </td>
+      <td style="padding:8px 14px;">
+        ${currEditMode
+          ?`<div class="edit-cell">
+              <input class="ie" style="font-size:13px;font-weight:600;margin-bottom:4px;" placeholder="주제" value="${w.topic}" onchange="updateWeek(${i},'topic',this.value)">
+              <textarea class="ie" style="font-size:11px;" placeholder="세부 내용" onchange="updateWeek(${i},'desc',this.value)">${w.desc}</textarea>
+            </div>`
+          :`<div class="wk-topic" style="font-size:${bs}px">${w.topic||w.week+'주차'}</div>
+            ${w.desc?`<div class="wk-desc" style="font-size:${bs-1}px">${w.desc}</div>`:''}`}
+      </td>
+    </tr>`).join('');
+
+  document.getElementById('detail-content').innerHTML=`
+    <div class="curr-view">
+      <div class="curr-view-header">
+        <button class="curr-back-btn" onclick="backToProfile()">← 프로필</button>
+        <span class="curr-view-title" style="color:${t.color}">${t.name} 선생님 · 16주 커리큘럼</span>
+      </div>
+      <div class="table-edit-bar">
+        <span style="font-size:12px;color:#999">${t.subject} 과정</span>
+        <button class="edit-btn" onclick="toggleCurrEdit()">
+          ${currEditMode?'✓ 저장':'✎ 편집'}
+        </button>
+      </div>
+      <table class="week-table">
+        <thead>
+          <tr>
+            <th style="background:${t.color};width:52px">주차</th>
+            <th style="background:${t.color}">주제 및 내용</th>
+          </tr>
+        </thead>
+        <tbody>${tableRows}</tbody>
+      </table>
+    </div>
+  `;
+}
+
+function backToProfile(){currentView='profile';currEditMode=false;renderProfileView();}
+function toggleCurrEdit(){
+  if(currEditMode)saveData();
+  currEditMode=!currEditMode;renderCurriculumView();
+}
+function updateWeek(i,f,v){DB.find(x=>x.id===currentId).weeks[i][f]=v;}
+
+function showAddTeacher(){
+  document.getElementById('modal-inner').innerHTML=`
+    <h3>선생님 추가</h3>
+    <div class="fg"><label class="flbl">이름</label><input class="finput" id="m-name" placeholder="홍길동"></div>
+    <div class="fg"><label class="flbl">전공</label>
+      <select class="fselect" id="m-subject"><option>보컬</option><option>피아노</option><option>기타</option><option>베이스</option><option>미디</option><option>작곡</option><option>드럼</option><option>댄스</option></select></div>
+    <div class="fg"><label class="flbl">소개</label><textarea class="ftxt" id="m-intro" placeholder="선생님 소개"></textarea></div>
+    <div class="mbtns">
+      <button class="mbcancel" onclick="closeModal()">취소</button>
+      <button class="mbok" style="background:#185FA5" onclick="confirmAdd()">추가하기</button>
+    </div>`;
+  document.getElementById('modal-bg').classList.add('open');
+}
+function closeModal(){document.getElementById('modal-bg').classList.remove('open');}
+function confirmAdd(){
+  const name=(document.getElementById('m-name').value.trim())||'새 선생님';
+  const subject=document.getElementById('m-subject').value;
+  const intro=(document.getElementById('m-intro').value.trim())||'소개를 입력해주세요.';
+  const CM={보컬:'#E74C3C',피아노:'#1D9E75',기타:'#534AB7',베이스:'#185FA5',미디:'#6B3A2A',작곡:'#BA7517',드럼:'#378ADD',댄스:'#8B7000'};
+  const BM={보컬:'#FDEDEC',피아노:'#E1F5EE',기타:'#EEEDFE',베이스:'#E6F1FB',미디:'#F5EBE8',작곡:'#FAEEDA',드럼:'#EAF3FD',댄스:'#FDFBE6'};
+  DB.push({id:nextId++,name,subject,role:subject+' 강사',color:CM[subject]||'#888',bg:BM[subject]||'#eee',photo:null,initials:name.slice(0,1),intro,edu:[],weeks:makeWeeks()});
+  saveData();closeModal();renderHomeGrid();renderSidebarList();
+}
+
+// 초기화
+loadData();syncSizeUI();renderHomeGrid();
+
+// 서비스워커 등록
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  });
+}
+</script>
+</body>
+</html>
