@@ -1,12 +1,12 @@
 {
-  "name": "부산뮤직 일광점 선생님",
-  "short_name": "부뮤일광",
+  "name": "부산뮤직 일광점 프로필",
+  "short_name": "프로필",
   "description": "부산뮤직 일광점 선생님 프로필 안내 앱",
   "start_url": "./index.html",
   "display": "standalone",
   "orientation": "landscape",
-  "background_color": "#ffffff",
-  "theme_color": "#ffffff",
+  "background_color": "#1A5FBA",
+  "theme_color": "#1A5FBA",
   "lang": "ko",
   "icons": [
     {
